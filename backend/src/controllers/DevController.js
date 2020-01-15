@@ -13,7 +13,8 @@ module.exports = {
     async store(req,res){
         const { github_username,techs,latitude,longitude } = req.body
 
-        let dev = await Dev.findOne({ github_username});
+        let dev = await Dev.findOne({ github_username });
+        console.log(dev)
         
         if(!dev){
             const response = await axios.get(`https://api.github.com/users/${github_username}`)
@@ -41,6 +42,42 @@ module.exports = {
         
         
     
+        return res.json(dev)
+    },
+
+    async update(req,res){
+        const {latitude,longitude,techs} = req.body
+        const github_username = req.params.id
+
+
+        const response = await axios.get(`https://api.github.com/users/${github_username}`)
+
+        const { name=login, bio, avatar_url } = (response.data)
+
+        const techsArray = parseStringAsArray(techs)
+
+        const location = {
+            type:'Point',
+            coordinates:[longitude,latitude]
+        }
+
+        const dev = await Dev.update({github_username: github_username},{
+                name,
+                avatar_url,
+                bio,
+                techs: techsArray,
+                location
+        })
+        
+
+        return res.json(dev)
+
+    },
+
+    async destroy(req,res){
+        const github_username= req.params.id
+        const dev = await Dev.deleteOne({github_username})
+
         return res.json(dev)
     }
 }
