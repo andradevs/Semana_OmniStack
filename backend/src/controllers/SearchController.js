@@ -5,9 +5,7 @@ module.exports ={
 
     async index(req,res){
         const { latitude, longitude, techs} = req.query
-
-        console.log(longitude, latitude)
-
+        
         const techsArray = parseStringAsArray(techs)
 
         const devs = await Dev.find({
